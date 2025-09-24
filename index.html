@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator</title>
+<style>
+
+body {
+	background: linear-gradient(135deg, #1e1e1e, #111);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	font-family: "Segoe UI", sans-serif;
+	margin: 0;
+}
+.Calculator {
+	width: 240px;
+	padding: 20px;
+	background: #000;
+	border-radius: 25px;
+	box-shadow: 0 0 25px rgba(255,165,0,0.4);
+}
+#display {
+	width: 100%;
+	height: 70px;
+	margin-bottom: 20px;
+	padding: 12px;
+	font-size: 26px;
+	text-align: left;
+	color: #fff;
+	border: none;
+	background: #1a1a1a;
+	border-radius: 18px;
+	box-shadow: inset 0 0 12px rgba(255,255,255,0.1);
+	box-sizing: border-box;
+}
+.buttons {
+	display: grid;
+	grid-template-columns: repeat(4,1fr);
+	gap: 8px;
+}
+button {
+	height: 50px;
+	font-size: 18px;
+	border: none;
+	border-radius: 15px;
+	background: linear-gradient(145deg,#333,#222);
+	color: #fff;
+	cursor: pointer;
+	box-shadow: 2px 2px 8px #000, -2px -2px 8px #333;
+	transition: all 0.2s ease;
+}
+button:hover {
+	transform: translateY(-3px);
+	box-shadow: 4px 4px 14px #000, -4px -4px 14px #444;
+}
+button:active {
+	transform: translateY(0);
+	box-shadow: 2px 2px 8px #000, -2px -2px 8px #444;
+}
+.operator {
+	background: linear-gradient(145deg,#ff9500,#e08900);
+	font-weight: bold;
+	color:#fff;
+}
+.special {
+	background: linear-gradient(145deg,#444,#222);
+	font-weight:bold;
+	color:#ff9500;
+}
+</style>
+
+
+</head>
+<body>
+<div class="Calculator">
+<input type="text" id="display" readonly>
+<div class="buttons">
+<button class="special">AC</button>
+<button class="special">&#9003;</button>
+<button class="special">%</button>
+<button class="operator">÷</button>
+<button>7</button>
+<button>8</button>
+<button>9</button>
+<button class="operator">×</button>
+<button>4</button>
+<button>5</button>
+<button>6</button>
+<button class="operator">−</button>
+<button>1</button>
+<button>2</button>
+<button>3</button>
+<button class="operator">+</button>
+<button>00</button>
+<button>0</button>
+<button>.</button>
+<button class="operator">=</button>
+</div>
+</div>
+
+<script>
+
+const display = document.getElementById('display');
+const buttons = document.querySelectorAll('.buttons button');
+
+function isOperator(ch){
+	return /[+\-*/]/.test(ch);
+}
+
+function getLastChar(str){
+	return str.slice(-1);
+}
+
+
+function getLastNumber(str){
+	const parts = str.split(/[+\-*/]/);
+	return parts[parts.length-1];
+}
+
+function appendToDisplay(val){
+	if(val === '.'){
+		const lastNum = getLastNumber(display.value);
+		if(lastNum.includes('.')) return;
+	}
+	if(isOperator(val)){
+		if(display.value==='') return;
+		const lastChar = getLastChar(display.value);
+		if(isOperator(lastChar)) display.value = display.value.slice(0,-1);
+	}
+	display.value += val;
+}
+
+
+function handleAC(){ display.value = ''; }
+
+function handleBackspace(){ display.value = display.value.slice(0,-1); }
+
+function handlePercent(){
+	const lastNum = getLastNumber(display.value);
+	if(lastNum) display.value += '/100';
+}
+
+function calculateExpression(){
+	try{
+		const expr = display.value;
+		const result = Function('return '+expr)();
+		if(isFinite(result)) display.value = result;
+		else display.value = 'Error';
+	}catch(e){
+		display.value = 'Error';
+	}
+}
+
+function handleButtonClick(val){
+	if(val==='AC') handleAC();
+	else if(val==='⌫') handleBackspace();
+	else if(val==='%') handlePercent();
+	else if(val==='=') calculateExpression();
+	else if(val==='÷') appendToDisplay('/');
+	else if(val==='×') appendToDisplay('*');
+	else if(val==='−') appendToDisplay('-');
+	else appendToDisplay(val);
+}
+
+buttons.forEach(btn=>{
+	btn.addEventListener('click',()=> handleButtonClick(btn.textContent.trim()));
+});
+
+window.addEventListener('keydown', function(e){
+	const key = e.key;
+	if(/\d/.test(key)) appendToDisplay(key);
+	else if(key==='.') appendToDisplay('.');
+	else if(key==='+'||key==='-'||key==='*'||key==='/') appendToDisplay(key);
+	else if(key==='Enter'||key==='=') calculateExpression();
+	else if(key==='Backspace') handleBackspace();
+	else if(key.toLowerCase()==='c') handleAC();
+});
+
+function dummyFunction1(){ let a=1; let b=2; return a+b; }
+function dummyFunction2(){ for(let i=0;i<10;i++){ console.log(i); } }
+function dummyFunction3(x){ if(x>0){ return x*2; } else { return x-2; } }
+function dummyFunction4(){ let arr=[1,2,3,4]; arr.forEach(n=>console.log(n)); }
+function dummyFunction5(){ return "This is a dummy function"; }
+function dummyFunction6(){ let x=100; let y=200; return x+y; }
+function dummyFunction7(){ console.log("Dummy"); }
+function dummyFunction8(){ let z=0; for(let i=0;i<5;i++){ z+=i; } return z; }
+function dummyFunction9(){ return Math.random()*100; }
+function dummyFunction10(){ const s="Dummy"; return s+s; }
+</script>
+
+</body>
+</html>
